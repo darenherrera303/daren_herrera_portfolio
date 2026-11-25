@@ -1,120 +1,157 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="binary">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tu Nombre — Ingeniero Multimedia</title>
-  <meta name="description" content="Portafolio de ingeniería multimedia: UX, diseño, 3D, programación y apps." />
+  <title>Daren Herrera — Ingeniero Multimedia</title>
+  <meta name="description" content="Portafolio de Daren Herrera, ingeniero multimedia: UX, diseño, 3D, programación y apps." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=VT323&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
 </head>
 <body>
-  <canvas id="rain" aria-hidden="true"></canvas>
-  <div class="scanlines" aria-hidden="true"></div>
+  <!-- símbolos reutilizables -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="palm" viewBox="0 0 200 300">
+        <path d="M96 300 C98 220 104 150 112 70 L120 70 C114 150 112 220 112 300Z" fill="currentColor"/>
+        <path d="M116 72 C80 40 40 50 10 90 C50 60 80 62 116 80Z" fill="currentColor"/>
+        <path d="M116 72 C90 20 50 10 20 20 C60 25 90 45 116 80Z" fill="currentColor"/>
+        <path d="M116 72 C130 20 170 5 195 25 C160 28 135 45 118 80Z" fill="currentColor"/>
+        <path d="M116 72 C150 40 185 55 198 95 C170 65 145 65 118 82Z" fill="currentColor"/>
+        <path d="M116 72 C110 40 100 20 85 5 C105 25 118 45 118 80Z" fill="currentColor"/>
+      </symbol>
+    </defs>
+  </svg>
 
-  <header class="nav">
-    <a href="#top" class="logo">TN<span>/</span>01</a>
-    <nav>
-      <a href="#trabajo">Trabajo</a>
-      <a href="#sobre-mi">Sobre mí</a>
-      <a href="#skills">Skills</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-    <button id="themeToggle" class="toggle" aria-label="Cambiar estilo">
-      <span class="t-binary">BINARY</span><i></i><span class="t-west">WEST</span>
-    </button>
-  </header>
+  <!-- escenario fijo: sol, rejilla, palmeras -->
+  <div class="stage" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="floor"></div>
+    <svg class="palm l"><use href="#palm"/></svg>
+    <svg class="palm r"><use href="#palm"/></svg>
+    <span class="float f1">△</span>
+    <span class="float f2">◯</span>
+    <span class="float f3">＋</span>
+    <span class="float f4">◇</span>
+    <span class="float f5">▽</span>
+  </div>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="sun" aria-hidden="true"></div>
-      <div class="floor" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <p class="eyebrow" id="eyebrow">01001001 · INGENIERO MULTIMEDIA</p>
-        <h1 id="heroName" data-text="TU NOMBRE">TU NOMBRE</h1>
-        <p class="lead">
-          Diseño, 3D, UX y código en el mismo lugar. Construyo experiencias digitales
-          entre la calle y el futuro: ritmo urbano, líneas limpias, tecnología.
-        </p>
-        <div class="cta">
-          <a class="btn primary" href="#trabajo">Ver proyectos</a>
-          <a class="btn" href="#contacto">Hablemos</a>
-        </div>
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="scan" aria-hidden="true"></div>
+
+  <!-- HUD tipo VHS -->
+  <div class="hud" aria-hidden="true">
+    <span><b class="blink">●</b> REC</span>
+    <span>▶ PLAY <em id="tape">00:00:00</em></span>
+    <span id="date"></span>
+  </div>
+
+  <!-- menú estilo dashboard -->
+  <aside class="dash">
+    <a href="#s0" class="brand">D<span>H</span><small>ダレン</small></a>
+    <ul id="menu">
+      <li><a href="#s0" data-i="0"><i>01</i><b>INICIO</b><small>ホーム</small></a></li>
+      <li><a href="#s1" data-i="1"><i>02</i><b>TRABAJO</b><small>作品</small></a></li>
+      <li><a href="#s2" data-i="2"><i>03</i><b>SOBRE MÍ</b><small>私について</small></a></li>
+      <li><a href="#s3" data-i="3"><i>04</i><b>SKILLS</b><small>スキル</small></a></li>
+      <li><a href="#s4" data-i="4"><i>05</i><b>CONTACTO</b><small>連絡</small></a></li>
+    </ul>
+    <button id="snd" class="snd" aria-pressed="false">♪ SONIDO: OFF</button>
+    <p class="keys">↑ ↓ para navegar</p>
+  </aside>
+
+  <main>
+    <!-- INICIO -->
+    <section id="s0" class="panel hero">
+      <div class="corner tl"></div><div class="corner br"></div>
+      <p class="eyebrow">▶ INGENIERO MULTIMEDIA ・ UX / 3D / DEV</p>
+      <h1>
+        <span class="glitch" data-text="DAREN">DAREN</span>
+        <span class="glitch" data-text="HERRERA">HERRERA</span>
+      </h1>
+      <p class="lead">
+        Diseño interfaces, modelo mundos en 3D y programo apps. Mi estética vive entre el
+        neón de los 80, el sol de California y la nostalgia de un menú de consola.
+      </p>
+      <div class="cta">
+        <a class="btn pink" href="#s1">VER PROYECTOS</a>
+        <a class="btn" href="#s4">HABLEMOS</a>
       </div>
-      <div class="hero-meta">
-        <span>BOGOTÁ · COL</span>
-        <span id="clock">--:--:--</span>
-        <span>SCROLL ↓</span>
+      <div class="jp-vert" aria-hidden="true">ダレン・エレラ</div>
+      <div class="ticker" aria-hidden="true">
+        <div><span>ＶＡＰＯＲＷＡＶＥ ・ ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＸ ・ ３Ｄ ・ ＤＥＳＩＧＮ ・ ＣＯＤＥ ・ </span><span>ＶＡＰＯＲＷＡＶＥ ・ ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＸ ・ ３Ｄ ・ ＤＥＳＩＧＮ ・ ＣＯＤＥ ・ </span></div>
       </div>
     </section>
 
     <!-- TRABAJO -->
-    <section id="trabajo" class="section">
-      <div class="section-head">
-        <span class="idx">01</span>
-        <h2>Trabajo</h2>
-      </div>
+    <section id="s1" class="panel">
+      <header class="ptitle"><span class="jp">作品</span><h2>TRABAJO</h2><i class="bar"></i></header>
       <div class="filters" id="filters"></div>
       <div class="grid" id="projects"></div>
     </section>
 
     <!-- SOBRE MI -->
-    <section id="sobre-mi" class="section about">
-      <div class="section-head">
-        <span class="idx">02</span>
-        <h2>Sobre mí</h2>
-      </div>
-      <div class="about-grid">
-        <p>
-          Soy ingeniero multimedia. Me muevo entre el diseño de interfaces, la
-          modelación 3D y el desarrollo de apps. Me obsesiona el diseño urbano:
-          la estética de los 80, el West Coast, los colores de atardecer y la
-          tipografía con carácter; y a la vez el minimalismo elegante, lo binario,
-          lo futurista.
-        </p>
-        <ul class="facts">
-          <li><b>Enfoque</b> UX · UI · 3D · Dev</li>
-          <li><b>Estética</b> Urbano 80s / Minimal tech</li>
-          <li><b>Ubicación</b> Colombia</li>
-          <li><b>Disponible</b> Proyectos y colaboraciones</li>
-        </ul>
+    <section id="s2" class="panel">
+      <header class="ptitle"><span class="jp">私について</span><h2>SOBRE MÍ</h2><i class="bar"></i></header>
+      <div class="about">
+        <article class="win">
+          <div class="tb"><span>sobre_mi.exe</span><em>_ □ ✕</em></div>
+          <div class="wb">
+            <p>
+              Soy <strong>Daren Herrera</strong>, ingeniero multimedia. Me muevo entre el
+              diseño de interfaces, el modelado 3D y el desarrollo de apps.
+            </p>
+            <p>
+              Me obsesiona el diseño urbano: los 80, el West Coast, los colores de atardecer y
+              la tipografía con carácter. Busco que cada proyecto se sienta como entrar a otro mundo.
+            </p>
+            <p class="cursor">&gt; siempre construyendo algo nuevo_</p>
+          </div>
+        </article>
+        <article class="win small">
+          <div class="tb"><span>datos.sys</span><em>_ □ ✕</em></div>
+          <div class="wb">
+            <ul class="facts">
+              <li><b>ENFOQUE</b> UX · UI · 3D · DEV</li>
+              <li><b>ESTÉTICA</b> VAPORWAVE 80s</li>
+              <li><b>BASE</b> COLOMBIA</li>
+              <li><b>ESTADO</b> <span class="ok">● DISPONIBLE</span></li>
+            </ul>
+          </div>
+        </article>
       </div>
     </section>
 
     <!-- SKILLS -->
-    <section id="skills" class="section">
-      <div class="section-head">
-        <span class="idx">03</span>
-        <h2>Skills</h2>
-      </div>
+    <section id="s3" class="panel">
+      <header class="ptitle"><span class="jp">スキル</span><h2>SKILLS</h2><i class="bar"></i></header>
       <div class="skills" id="skills-list"></div>
     </section>
 
     <!-- CONTACTO -->
-    <section id="contacto" class="section contact">
-      <div class="section-head">
-        <span class="idx">04</span>
-        <h2>Contacto</h2>
-      </div>
+    <section id="s4" class="panel contact">
+      <header class="ptitle"><span class="jp">連絡</span><h2>CONTACTO</h2><i class="bar"></i></header>
       <a class="mail" href="mailto:tucorreo@ejemplo.com">tucorreo@ejemplo.com</a>
       <div class="links">
-        <a href="https://github.com/tu-usuario" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://behance.net/tu-usuario" target="_blank" rel="noopener">Behance</a>
-        <a href="https://instagram.com/tu-usuario" target="_blank" rel="noopener">Instagram</a>
+        <a class="btn" href="https://github.com/tu-usuario" target="_blank" rel="noopener">GITHUB</a>
+        <a class="btn" href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener">LINKEDIN</a>
+        <a class="btn" href="https://behance.net/tu-usuario" target="_blank" rel="noopener">BEHANCE</a>
+        <a class="btn" href="https://instagram.com/tu-usuario" target="_blank" rel="noopener">INSTAGRAM</a>
       </div>
+      <footer class="footer">
+        <span>© <span id="year"></span> DAREN HERRERA</span>
+        <span>ＧＡＭＥ ＯＶＥＲ？ ＮＯ ・ ＰＵＳＨ ＳＴＡＲＴ</span>
+      </footer>
     </section>
   </main>
 
-  <footer class="footer">
-    <span>© <span id="year"></span> Tu Nombre</span>
-    <span>Hecho a mano · HTML / CSS / JS</span>
-  </footer>
-
   <script src="projects.js"></script>
-  <script src="main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

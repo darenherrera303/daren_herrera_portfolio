@@ -7,7 +7,7 @@
 //  enlace: link al caso de estudio, repo o demo (opcional)
 // ============================================================
 
-const PROJECTS = [
+window.PROJECTS = [
   {
     titulo: "Rediseño App Móvil",
     categoria: "UX",
@@ -64,7 +64,7 @@ const PROJECTS = [
   }
 ];
 
-const SKILLS = {
+window.SKILLS = {
   "UX / UI": ["Investigación", "Wireframes", "Prototipado", "Design Systems", "Figma"],
   "Diseño": ["Branding", "Tipografía", "Illustrator", "Photoshop", "Motion"],
   "3D": ["Blender", "Modelado", "Texturizado", "Render", "Unity"],
