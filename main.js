@@ -100,6 +100,135 @@ function renderFiles() {
 }
 renderTabs(); renderFiles();
 
+/* ================= GALERÍA 3D (Sketchfab) ================= */
+const MODELS = window.MODELS3D || [];
+const UX = window.UXFILES || [];
+const pad2 = (n) => String(n).padStart(2, "0");
+const CUBE_ICO = `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><path fill="currentColor" d="M32 3l22 10v14L32 37 10 27V13z"/><path fill="#140f26" opacity=".45" d="M32 3l22 10-22 10L10 13z"/><rect x="31" y="23" width="2" height="14" fill="#140f26" opacity=".6"/></svg>`;
+const modelPage = (m) => `https://sketchfab.com/3d-models/${m.slug}-${m.id}`;
+const gal = { i: 0, live: false };
+const thumbs = {};
+
+function makeFrame(m) {
+  const f = document.createElement("iframe");
+  f.title = m.titulo;
+  f.setAttribute("frameborder", "0");
+  f.setAttribute("allowfullscreen", "");
+  f.setAttribute("allow", "autoplay; fullscreen; xr-spatial-tracking");
+  f.setAttribute("xr-spatial-tracking", "");
+  f.setAttribute("web-share", "");
+  f.src = `https://sketchfab.com/models/${m.id}/embed?ui_theme=dark`;
+  return f;
+}
+
+function bgUrl(url) { return `url(${JSON.stringify(url)})`; }
+
+function showModel(i) {
+  if (!MODELS.length) return;
+  gal.i = (i + MODELS.length) % MODELS.length;
+  const m = MODELS[gal.i];
+  $("#gTitle").textContent = m.titulo;
+  $("#gCount").textContent = `${pad2(gal.i + 1)}/${pad2(MODELS.length)}`;
+  $("#gMeta").textContent = m.autor ? `POR ${m.autor.toUpperCase()}` : "";
+  $("#gLink").href = modelPage(m);
+
+  const stage = $("#vstage");
+  stage.replaceChildren();
+  if (gal.live) {
+    stage.appendChild(makeFrame(m));
+  } else {
+    // el visor pesa: solo se carga cuando la persona lo pide
+    const f = document.createElement("button");
+    f.type = "button";
+    f.className = "facade";
+    f.setAttribute("aria-label", `Cargar modelo 3D: ${m.titulo}`);
+    const img = m.imagen || thumbs[m.id];
+    if (img) f.style.backgroundImage = bgUrl(img);
+    f.innerHTML = `<span class="cube">${CUBE_ICO}</span><span class="play">▶ CARGAR MODELO 3D</span>`;
+    f.addEventListener("click", () => { gal.live = true; blip(900, 0.1); showModel(gal.i); });
+    stage.appendChild(f);
+  }
+  $$("#strip .thumb-btn").forEach((b, k) => b.classList.toggle("active", k === gal.i));
+}
+
+function setThumb(k, url) {
+  thumbs[MODELS[k].id] = url;
+  const tn = $$("#strip .tn")[k];
+  if (tn) { tn.style.backgroundImage = bgUrl(url); tn.replaceChildren(); }
+  if (k === gal.i && !gal.live) {
+    const f = $(".facade");
+    if (f) f.style.backgroundImage = bgUrl(url);
+  }
+}
+
+$("#strip").innerHTML = MODELS.map((m, k) => `
+  <button class="thumb-btn" type="button" data-k="${k}">
+    <span class="tn">${CUBE_ICO}</span>
+    <span><b>${esc(m.titulo)}</b><small>${pad2(k + 1)} · SKETCHFAB</small></span>
+  </button>`).join("");
+$$("#strip .thumb-btn").forEach((b) => b.addEventListener("click", () => { blip(560, 0.07); showModel(Number(b.dataset.k)); }));
+$("#gPrev").addEventListener("click", () => { blip(520, 0.06); showModel(gal.i - 1); });
+$("#gNext").addEventListener("click", () => { blip(620, 0.06); showModel(gal.i + 1); });
+showModel(0);
+
+// miniaturas: propia (imagen) o la que publica Sketchfab (oEmbed); si falla, queda el ícono
+MODELS.forEach(async (m, k) => {
+  if (m.imagen) { setThumb(k, m.imagen); return; }
+  try {
+    const r = await fetch(`https://sketchfab.com/oembed?url=${encodeURIComponent(modelPage(m))}`);
+    if (!r.ok) return;
+    const j = await r.json();
+    if (j && j.thumbnail_url) setThumb(k, j.thumbnail_url);
+  } catch {}
+});
+
+/* ================= UX / UI (Figma) ================= */
+const FIGMA_ICO = `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><rect x="8" y="3" width="48" height="34" fill="currentColor"/><rect x="12" y="7" width="16" height="11" fill="#140f26" opacity=".55"/><rect x="32" y="7" width="20" height="4" fill="#140f26" opacity=".55"/><rect x="32" y="14" width="14" height="4" fill="#140f26" opacity=".55"/><rect x="12" y="22" width="40" height="11" fill="#140f26" opacity=".55"/></svg>`;
+const UX_COLORS = ["var(--pink)", "var(--cyan)", "var(--mint)", "var(--purple)"];
+const figmaEmbed = (u) => `https://embed.figma.com/design/${u.id}/${u.slug}?embed-host=share`;
+const figmaPage = (u) => `https://www.figma.com/design/${u.id}/${u.slug}`;
+
+$("#uxgrid").innerHTML = UX.map((u, k) => `
+  <button class="uxcard win" type="button" data-k="${k}" style="--c:${UX_COLORS[k % UX_COLORS.length]}">
+    <div class="tb"><span>figma_${pad2(k + 1)}.fig</span><em>_ □ ✕</em></div>
+    <div class="art">${FIGMA_ICO}<span class="stamp">FIGMA</span></div>
+    <div class="wb">
+      <h3>${esc(u.titulo)}</h3>
+      <p>${esc(u.descripcion || "Diseño de interfaz · prototipo interactivo")}</p>
+      <div class="sfoot"><span class="open">ABRIR DISEÑO →</span><span>${pad2(k + 1)}</span></div>
+    </div>
+  </button>`).join("");
+
+const modal = $("#modal");
+let lastFocus = null;
+function openFigma(k) {
+  const u = UX[k];
+  if (!u) return;
+  lastFocus = document.activeElement;
+  $("#mTitle").textContent = u.titulo;
+  $("#mLink").href = figmaPage(u);
+  const f = document.createElement("iframe");
+  f.title = u.titulo;
+  f.src = figmaEmbed(u);
+  f.setAttribute("allowfullscreen", "");
+  $("#mStage").replaceChildren(f);
+  modal.hidden = false;
+  document.documentElement.style.overflow = "hidden";
+  $("#mClose").focus();
+  blip(640, 0.1);
+}
+function closeFigma() {
+  modal.hidden = true;
+  $("#mStage").replaceChildren();
+  document.documentElement.style.overflow = "";
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+  blip(380, 0.08);
+}
+$$("#uxgrid .uxcard").forEach((c) => c.addEventListener("click", () => openFigma(Number(c.dataset.k))));
+$("#mClose").addEventListener("click", closeFigma);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeFigma(); });
+
+
 /* ================= SKILLS: CARGA CON FUEGO 8-BIT ================= */
 // Paleta de llama (intensidad 0..11)
 const PAL = [
@@ -243,11 +372,21 @@ links.forEach((l) => l.addEventListener("mouseenter", () => blip(700, 0.03)));
 
 // Teclado tipo D-pad
 addEventListener("keydown", (e) => {
+  if (!modal.hidden) { if (e.key === "Escape") closeFigma(); return; }
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+
+  // ← → cambian de modelo cuando estás en la galería 3D
+  if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && sections[current] && sections[current].id === "s2") {
+    e.preventDefault();
+    blip(560, 0.06);
+    showModel(gal.i + (e.key === "ArrowRight" ? 1 : -1));
+    return;
+  }
+
   const down = ["ArrowDown", "PageDown"].includes(e.key);
   const up = ["ArrowUp", "PageUp"].includes(e.key);
   if (!down && !up) return;
-  const tag = document.activeElement && document.activeElement.tagName;
-  if (tag === "BUTTON") return;
   e.preventDefault();
   const next = Math.max(0, Math.min(sections.length - 1, current + (down ? 1 : -1)));
   sections[next].scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
@@ -369,13 +508,14 @@ async function initGL() {
   scene.add(points);
 
   const C = (a, b, c) => [new THREE.Color(a), new THREE.Color(b), new THREE.Color(c)];
-  // un estado por sección: inicio, trabajo, sobre mí, skills, formación, contacto
+  // un estado por sección: inicio, trabajo, galería 3D, UX/UI, sobre mí, skills, contacto
   const STATES = [
     { x: 2.3, y: 0.15, s: 1.15, amp: 0.5, a: 0.95, pal: C("#c4869f", "#7fb4c0", "#dccb9f") },
     { x: 3.9, y: -0.2, s: 0.55, amp: 0.3, a: 0.4, pal: C("#8a7db0", "#8fb8a4", "#7fb4c0") },
+    { x: 3.9, y: 0.0, s: 0.45, amp: 0.3, a: 0.28, pal: C("#7fb4c0", "#8a7db0", "#c4869f") },
+    { x: 3.7, y: -0.1, s: 0.55, amp: 0.35, a: 0.35, pal: C("#c4869f", "#7fb4c0", "#dccb9f") },
     { x: 3.2, y: 0.1, s: 0.8, amp: 0.55, a: 0.55, pal: C("#7fb4c0", "#c4869f", "#8fb8a4") },
     { x: 3.8, y: 0.0, s: 0.6, amp: 0.4, a: 0.4, pal: C("#c4869f", "#dccb9f", "#8a7db0") },
-    { x: 3.5, y: -0.1, s: 0.7, amp: 0.45, a: 0.5, pal: C("#8fb8a4", "#8a7db0", "#c4869f") },
     { x: 0.0, y: -0.3, s: 1.5, amp: 0.7, a: 0.4, pal: C("#c4869f", "#dccb9f", "#8a7db0") },
   ];
   const tmp = new THREE.Color();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Daren Herrera — Ingeniero Multimedia</title>
-  <meta name="description" content="Daren Herrera, ingeniero multimedia: diseño UX/UI, comunicación visual y productos digitales." />
+  <meta name="description" content="Daren Herrera, ingeniero multimedia: diseño UX/UI, modelado 3D y productos digitales." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=VT323&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet" />
@@ -58,13 +58,14 @@
     <ul id="menu">
       <li><a href="#s0" data-i="0"><i>01</i><b>INICIO</b><small>ホーム</small></a></li>
       <li><a href="#s1" data-i="1"><i>02</i><b>TRABAJO</b><small>作品</small></a></li>
-      <li><a href="#s2" data-i="2"><i>03</i><b>SOBRE MÍ</b><small>私について</small></a></li>
-      <li><a href="#s3" data-i="3"><i>04</i><b>SKILLS</b><small>スキル</small></a></li>
-      <li><a href="#s4" data-i="4"><i>05</i><b>FORMACIÓN</b><small>学歴</small></a></li>
-      <li><a href="#s5" data-i="5"><i>06</i><b>CONTACTO</b><small>連絡</small></a></li>
+      <li><a href="#s2" data-i="2"><i>03</i><b>GALERÍA 3D</b><small>モデル</small></a></li>
+      <li><a href="#s3" data-i="3"><i>04</i><b>UX / UI</b><small>体験</small></a></li>
+      <li><a href="#s4" data-i="4"><i>05</i><b>SOBRE MÍ</b><small>私について</small></a></li>
+      <li><a href="#s5" data-i="5"><i>06</i><b>SKILLS</b><small>スキル</small></a></li>
+      <li><a href="#s6" data-i="6"><i>07</i><b>CONTACTO</b><small>連絡</small></a></li>
     </ul>
     <button id="snd" class="snd" aria-pressed="false">♪ SONIDO: OFF</button>
-    <p class="keys">↑ ↓ para navegar</p>
+    <p class="keys">↑ ↓ secciones · ← → modelos</p>
   </aside>
 
   <main>
@@ -81,8 +82,8 @@
         con una visión integral centrada en el usuario.
       </p>
       <div class="cta">
-        <a class="btn pink" href="#s1">VER PROYECTOS</a>
-        <a class="btn" href="#s5">HABLEMOS</a>
+        <a class="btn pink" href="#s2">VER MODELOS 3D</a>
+        <a class="btn" href="#s6">HABLEMOS</a>
       </div>
       <div class="jp-vert" aria-hidden="true">ダレン・エレラ</div>
       <div class="ticker" aria-hidden="true">
@@ -105,8 +106,36 @@
       </div>
     </section>
 
-    <!-- SOBRE MI -->
+    <!-- GALERÍA 3D (Sketchfab) -->
     <section id="s2" class="panel">
+      <header class="ptitle"><span class="jp">モデル</span><h2>GALERÍA 3D</h2><i class="bar"></i></header>
+      <p class="hint">▶ Elige una pieza y gírala con el mouse. También puedes usar ← → para cambiar de modelo.</p>
+      <div class="gallery">
+        <div class="viewer win">
+          <div class="tb"><span id="gTitle">modelo</span><em id="gCount">01/01</em></div>
+          <div class="vstage" id="vstage"></div>
+          <div class="vfoot">
+            <span class="arrows">
+              <button class="arr" id="gPrev" aria-label="Modelo anterior">‹</button>
+              <button class="arr" id="gNext" aria-label="Modelo siguiente">›</button>
+            </span>
+            <span id="gMeta"></span>
+            <a id="gLink" href="https://sketchfab.com/MFDAREN" target="_blank" rel="noopener">VER EN SKETCHFAB →</a>
+          </div>
+        </div>
+        <div class="strip" id="strip"></div>
+      </div>
+    </section>
+
+    <!-- UX / UI (Figma) -->
+    <section id="s3" class="panel">
+      <header class="ptitle"><span class="jp">体験</span><h2>UX / UI</h2><i class="bar"></i></header>
+      <p class="hint">▶ Abre cada archivo para explorar el diseño completo en Figma.</p>
+      <div class="uxgrid" id="uxgrid"></div>
+    </section>
+
+    <!-- SOBRE MI -->
+    <section id="s4" class="panel">
       <header class="ptitle"><span class="jp">私について</span><h2>SOBRE MÍ</h2><i class="bar"></i></header>
       <div class="about">
         <article class="win">
@@ -163,57 +192,23 @@
     </section>
 
     <!-- SKILLS: medidor de carga con fuego 8-bit -->
-    <section id="s3" class="panel">
+    <section id="s5" class="panel">
       <header class="ptitle"><span class="jp">スキル</span><h2>SKILLS</h2><i class="bar"></i></header>
       <p class="hint">▶ Pasa el mouse sobre cada módulo para cargar el combo (en celular, toca la tarjeta).</p>
       <div class="skillgrid" id="skills-list"></div>
     </section>
 
-    <!-- FORMACIÓN -->
-    <section id="s4" class="panel">
-      <header class="ptitle"><span class="jp">学歴</span><h2>FORMACIÓN</h2><i class="bar"></i></header>
-      <div class="edu">
-        <article class="win">
-          <div class="tb"><span>educacion.log</span><em>_ □ ✕</em></div>
-          <div class="wb">
-            <ol class="timeline">
-              <li>
-                <em>2019 – cursando</em>
-                <b>Ingeniería en Multimedia</b>
-                <span>Universidad Militar Nueva Granada</span>
-              </li>
-              <li>
-                <em>Egresado · 2014 – 2017</em>
-                <b>Bachiller académico</b>
-                <span>Institución Educativa Pablo Herrera</span>
-              </li>
-            </ol>
-          </div>
-        </article>
-        <article class="win">
-          <div class="tb"><span>certificados_sena.zip</span><em>_ □ ✕</em></div>
-          <div class="wb">
-            <ul class="certs">
-              <li><em>28 FEB 2025</em><b>Comunicación gráfica utilizando herramientas de Adobe Illustrator</b><span>★ Certificado · SENA</span></li>
-              <li><em>24 ABR 2025</em><b>Marketing digital</b><span>★ Certificado · SENA</span></li>
-              <li><em>02 OCT 2018</em><b>Esculpido y texturizado digital en Pixologic ZBrush</b><span>★ Certificado · SENA</span></li>
-              <li><em>31 JUL 2018</em><b>Diseño de videojuegos en tercera persona con Unity</b><span>★ Certificado · SENA</span></li>
-            </ul>
-          </div>
-        </article>
-      </div>
-    </section>
-
     <!-- CONTACTO -->
-    <section id="s5" class="panel contact">
+    <section id="s6" class="panel contact">
       <header class="ptitle"><span class="jp">連絡</span><h2>CONTACTO</h2><i class="bar"></i></header>
       <a class="mail" href="mailto:darenherrera34@gmail.com">darenherrera34@gmail.com</a>
       <a class="phone" href="tel:+573226869229">+57 322 686 9229</a>
       <div class="links">
         <a class="btn pink" href="mailto:darenherrera34@gmail.com">ESCRIBIR</a>
         <a class="btn" href="https://wa.me/573226869229" target="_blank" rel="noopener">WHATSAPP</a>
-        <a class="btn" href="https://www.linkedin.com/in/daren-santiago-herrera-prada-9a63051b9/" target="_blank" rel="noopener">LINKEDIN</a>
-        <a class="btn" href="https://github.com/darenherrera303" target="_blank" rel="noopener">GITHUB</a>
+        <a class="btn" href="https://www.linkedin.com/in/daren-santiago-herrera-prada" target="_blank" rel="noopener">LINKEDIN</a>
+        <a class="btn" href="https://sketchfab.com/MFDAREN" target="_blank" rel="noopener">SKETCHFAB</a>
+        <a class="btn" href="https://github.com/tu-usuario" target="_blank" rel="noopener">GITHUB</a>
       </div>
       <footer class="footer">
         <span>© <span id="year"></span> DAREN HERRERA</span>
@@ -221,6 +216,15 @@
       </footer>
     </section>
   </main>
+
+  <!-- visor ampliado para archivos de Figma -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Visor de diseño" hidden>
+    <div class="modal-win win">
+      <div class="tb"><span id="mTitle">archivo</span><button class="x" id="mClose" aria-label="Cerrar">✕</button></div>
+      <div class="mstage" id="mStage"></div>
+      <div class="vfoot"><span>FIGMA · PROTOTIPO</span><a id="mLink" href="#" target="_blank" rel="noopener">ABRIR EN FIGMA →</a></div>
+    </div>
+  </div>
 
   <script src="projects.js"></script>
   <script type="module" src="main.js"></script>
