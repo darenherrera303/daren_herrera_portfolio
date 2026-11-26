@@ -11,7 +11,7 @@ function blip(freq = 520, dur = 0.07) {
     audio ||= new (window.AudioContext || window.webkitAudioContext)();
     const o = audio.createOscillator(), g = audio.createGain();
     o.type = "square"; o.frequency.value = freq;
-    g.gain.setValueAtTime(0.04, audio.currentTime);
+    g.gain.setValueAtTime(0.03, audio.currentTime);
     g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
     o.connect(g).connect(audio.destination);
     o.start(); o.stop(audio.currentTime + dur);
@@ -24,61 +24,99 @@ $("#snd").addEventListener("click", (e) => {
   blip(880, 0.1);
 });
 
-/* ================= PROYECTOS / SKILLS ================= */
+/* ================= ARCHIVADOR DE PROYECTOS ================= */
 const PROJECTS = window.PROJECTS || [];
 const SKILLS = window.SKILLS || {};
-const filters = $("#filters"), grid = $("#projects");
+const tabs = $("#filters"), grid = $("#projects");
 const cats = ["Todos", ...new Set(PROJECTS.map((p) => p.categoria))];
 let activeCat = "Todos";
 
-function renderFilters() {
-  filters.innerHTML = "";
+const countOf = (c) => PROJECTS.filter((p) => c === "Todos" || p.categoria === c).length;
+
+function renderTabs() {
+  tabs.innerHTML = "";
   cats.forEach((c) => {
     const b = document.createElement("button");
-    b.className = "chip" + (c === activeCat ? " active" : "");
-    b.textContent = c.toUpperCase();
-    b.onclick = () => { activeCat = c; blip(660); renderFilters(); renderProjects(); };
-    filters.appendChild(b);
+    b.className = "tab" + (c === activeCat ? " active" : "");
+    b.innerHTML = `${esc(c.toUpperCase())}<small>${countOf(c)}</small>`;
+    b.onclick = () => { if (c === activeCat) return; activeCat = c; blip(480, 0.09); renderTabs(); renderFiles(); };
+    tabs.appendChild(b);
   });
 }
 
-function renderProjects() {
+function renderFiles() {
+  const list = PROJECTS.map((p, idx) => ({ p, idx })).filter(({ p }) => activeCat === "Todos" || p.categoria === activeCat);
+  $("#folderName").textContent = `CARPETA / ${activeCat.toUpperCase()}`;
+  $("#folderCount").textContent = `${list.length} ARCHIVO${list.length === 1 ? "" : "S"}`;
   grid.innerHTML = "";
-  PROJECTS.filter((p) => activeCat === "Todos" || p.categoria === activeCat).forEach((p, i) => {
+  if (!list.length) { grid.innerHTML = `<p class="empty">Carpeta vacía.</p>`; return; }
+
+  list.forEach(({ p, idx }, i) => {
     const a = document.createElement("a");
-    a.className = "card win";
+    a.className = "file";
     a.href = p.enlace || "#";
     if (p.enlace && p.enlace !== "#") { a.target = "_blank"; a.rel = "noopener"; }
     const thumb = p.imagen
       ? `<img src="${esc(p.imagen)}" alt="${esc(p.titulo)}" loading="lazy" />`
       : `<div class="ph">${esc(p.titulo)}</div>`;
+    const code = `DH-${p.anio}-${String(idx + 1).padStart(3, "0")}`;
     a.innerHTML = `
-      <div class="tb"><span>${esc(p.categoria.toLowerCase())}_${String(i + 1).padStart(2, "0")}.exe</span><em>_ □ ✕</em></div>
-      <div class="wb">
-        <div class="thumb">${thumb}</div>
-        <div class="meta"><span>${esc(p.categoria.toUpperCase())}</span><span>${esc(p.anio)}</span></div>
-        <h3>${esc(p.titulo)}</h3>
-        <p>${esc(p.descripcion)}</p>
-        <div class="tags">${(p.tags || []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
-      </div>`;
-    // tilt 3D
+      <div class="file-top"><span>${code}</span><span>${esc(p.anio)}</span></div>
+      <div class="thumb">${thumb}<span class="stamp">${esc(p.categoria.toUpperCase())}</span></div>
+      <h3>${esc(p.titulo)}</h3>
+      <p>${esc(p.descripcion)}</p>
+      <dl class="specs">
+        <dt>TIPO</dt><dd>${esc(p.categoria)}</dd>
+        <dt>HERRAM.</dt><dd>${esc((p.herramientas || []).join(" · ") || "—")}</dd>
+      </dl>
+      <span class="open">ABRIR ARCHIVO →</span>`;
     a.addEventListener("pointermove", (e) => {
       const r = a.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      a.style.transform = `perspective(700px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(6px)`;
+      a.style.transform = `perspective(700px) rotateY(${x * 7}deg) rotateX(${-y * 7}deg) translateY(-3px)`;
     });
     a.addEventListener("pointerleave", () => { a.style.transform = ""; });
     grid.appendChild(a);
-    setTimeout(() => a.classList.add("in"), 70 * i);
+    setTimeout(() => a.classList.add("in"), reduced ? 0 : 90 * i);
   });
 }
-renderFilters(); renderProjects();
+renderTabs(); renderFiles();
 
-$("#skills-list").innerHTML = Object.entries(SKILLS).map(([k, v]) => `
+/* ================= SKILLS: NIVELES TIPO COMBO ================= */
+const rankOf = (lv) => (lv >= 9 ? "S" : lv >= 7 ? "A" : lv >= 5 ? "B" : lv >= 3 ? "C" : "D");
+let comboTotal = 0, comboCount = 0;
+
+$("#skills-list").innerHTML = Object.entries(SKILLS).map(([group, items], g) => `
   <article class="win">
-    <div class="tb"><span>${esc(k.toLowerCase())}.dll</span><em>_ □ ✕</em></div>
-    <div class="wb"><h4>${esc(k.toUpperCase())}</h4><ul>${v.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></div>
+    <div class="tb"><span>${esc(group.toLowerCase())}.dll</span><em>_ □ ✕</em></div>
+    <div class="wb">
+      <h4>${esc(group)}</h4>
+      <ul>${items.map((s) => {
+        comboTotal += s.lv; comboCount++;
+        const r = rankOf(s.lv);
+        const segs = Array.from({ length: 10 }, (_, d) => `<i class="seg${d < s.lv ? " on" : ""}" style="--d:${d};--g:${g}"></i>`).join("");
+        return `<li class="sk"><span class="nm">${esc(s.n)}</span><span class="meter" aria-label="Nivel ${s.lv} de 10">${segs}</span><span class="rank r-${r}">${r}</span></li>`;
+      }).join("")}</ul>
+    </div>
   </article>`).join("");
+
+const avg = comboCount ? comboTotal / comboCount : 0;
+$("#comboRank").textContent = avg >= 8.5 ? "S" : avg >= 7 ? "A" : avg >= 5 ? "B" : "C";
+
+let comboRAF = 0;
+function runCombo() {
+  const el = $("#comboN");
+  cancelAnimationFrame(comboRAF);
+  if (reduced) { el.textContent = comboTotal; return; }
+  const start = performance.now(), dur = 1800;
+  const step = (now) => {
+    const k = Math.min(1, (now - start - 350) / dur);
+    el.textContent = Math.round(comboTotal * Math.max(0, k));
+    if (k < 1) comboRAF = requestAnimationFrame(step);
+  };
+  el.textContent = 0;
+  comboRAF = requestAnimationFrame(step);
+}
 
 $("#year").textContent = new Date().getFullYear();
 $("#date").textContent = new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
@@ -101,6 +139,7 @@ function setActive(i) {
   current = i;
   links.forEach((l, k) => l.classList.toggle("on", k === i));
   sections.forEach((s, k) => s.classList.toggle("show", k === i));
+  if (i === 3) runCombo();
   blip(300 + i * 90, 0.08);
 }
 
@@ -196,15 +235,15 @@ async function initGL() {
       float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);
       float band = 0.5 + 0.5 * sin(vD * 7.0 + uTime * 0.6 + vN.y * 3.0);
       vec3 col = mix(uC1, uC2, band);
-      col = mix(col, uC3, f * 0.85) + f * 0.35 * uC2;
-      gl_FragColor = vec4(col, (0.28 + f * 0.72) * uAlpha);
+      col = mix(col, uC3, f * 0.8) + f * 0.2 * uC2;
+      gl_FragColor = vec4(col, (0.26 + f * 0.65) * uAlpha);
     }`;
 
   const uniforms = {
     uTime: { value: 0 }, uAmp: { value: 0.5 },
-    uC1: { value: new THREE.Color("#ff71ce") },
-    uC2: { value: new THREE.Color("#01cdfe") },
-    uC3: { value: new THREE.Color("#fffb96") },
+    uC1: { value: new THREE.Color("#c4869f") },
+    uC2: { value: new THREE.Color("#7fb4c0") },
+    uC3: { value: new THREE.Color("#dccb9f") },
     uAlpha: { value: 1 },
   };
 
@@ -214,40 +253,39 @@ async function initGL() {
   }));
   const wire = new THREE.Mesh(geo, new THREE.ShaderMaterial({
     uniforms, vertexShader: vert, wireframe: true, transparent: true, depthWrite: false,
-    fragmentShader: `uniform vec3 uC2; varying vec3 vN; void main(){ gl_FragColor = vec4(uC2, 0.14); }`,
+    fragmentShader: `uniform vec3 uC2; varying vec3 vN; void main(){ gl_FragColor = vec4(uC2, 0.1); }`,
   }));
   wire.scale.setScalar(1.015);
   const blob = new THREE.Group();
   blob.add(solid, wire);
   scene.add(blob);
 
-  // formas flotantes
-  const mk = (g, c) => new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: c, wireframe: true, transparent: true, opacity: 0.55 }));
+  // formas flotantes (lentas, "chill")
+  const mk = (g, c) => new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: c, wireframe: true, transparent: true, opacity: 0.38 }));
   const shapes = [
-    mk(new THREE.TorusGeometry(0.5, 0.12, 12, 40), "#05ffa1"),
-    mk(new THREE.OctahedronGeometry(0.45), "#ff71ce"),
-    mk(new THREE.TetrahedronGeometry(0.5), "#fffb96"),
+    mk(new THREE.TorusGeometry(0.5, 0.12, 12, 40), "#8fb8a4"),
+    mk(new THREE.OctahedronGeometry(0.45), "#c4869f"),
+    mk(new THREE.TetrahedronGeometry(0.5), "#dccb9f"),
   ];
   shapes.forEach((s) => scene.add(s));
 
   // partículas
-  const N = 500, pos = new Float32Array(N * 3);
+  const N = 400, pos = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - 0.5) * 18; pos[i * 3 + 1] = (Math.random() - 0.5) * 11; pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 2; }
   const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const points = new THREE.Points(pg, new THREE.PointsMaterial({ color: "#b967ff", size: 0.04, transparent: true, opacity: 0.8 }));
+  const points = new THREE.Points(pg, new THREE.PointsMaterial({ color: "#8a7db0", size: 0.035, transparent: true, opacity: 0.6 }));
   scene.add(points);
 
-  // estados por sección: posición, escala, amplitud, alpha, paleta
   const C = (a, b, c) => [new THREE.Color(a), new THREE.Color(b), new THREE.Color(c)];
   const STATES = [
-    { x: 2.3, y: 0.15, s: 1.15, amp: 0.55, a: 1.0, pal: C("#ff71ce", "#01cdfe", "#fffb96") },
-    { x: 3.6, y: -0.2, s: 0.6, amp: 0.35, a: 0.55, pal: C("#b967ff", "#05ffa1", "#01cdfe") },
-    { x: 3.0, y: 0.1, s: 0.95, amp: 0.7, a: 0.85, pal: C("#01cdfe", "#ff71ce", "#05ffa1") },
-    { x: 3.5, y: 0.0, s: 0.7, amp: 0.45, a: 0.6, pal: C("#05ffa1", "#b967ff", "#ff71ce") },
-    { x: 0.0, y: -0.3, s: 1.5, amp: 0.8, a: 0.45, pal: C("#ff71ce", "#fffb96", "#b967ff") },
+    { x: 2.3, y: 0.15, s: 1.15, amp: 0.5, a: 0.95, pal: C("#c4869f", "#7fb4c0", "#dccb9f") },
+    { x: 3.6, y: -0.2, s: 0.6, amp: 0.32, a: 0.5, pal: C("#8a7db0", "#8fb8a4", "#7fb4c0") },
+    { x: 3.0, y: 0.1, s: 0.95, amp: 0.6, a: 0.8, pal: C("#7fb4c0", "#c4869f", "#8fb8a4") },
+    { x: 3.5, y: 0.0, s: 0.7, amp: 0.4, a: 0.55, pal: C("#8fb8a4", "#8a7db0", "#c4869f") },
+    { x: 0.0, y: -0.3, s: 1.5, amp: 0.7, a: 0.4, pal: C("#c4869f", "#dccb9f", "#8a7db0") },
   ];
   const tmp = new THREE.Color();
-  const mouse = { x: 0, y: 0 };
+  const mouse = { x: 0, y: 0 }, mouseS = { x: 0, y: 0 };
   addEventListener("pointermove", (e) => { mouse.x = e.clientX / innerWidth - 0.5; mouse.y = e.clientY / innerHeight - 0.5; });
 
   function resize() {
@@ -260,9 +298,13 @@ async function initGL() {
   let smooth = 0;
   const clock = new THREE.Clock();
   function frame() {
-    const t = clock.getElapsedTime() * (reduced ? 0.2 : 1);
+    // todo el movimiento va a ritmo lento
+    const t = clock.getElapsedTime() * (reduced ? 0.1 : 0.45);
     const target = progress();
-    smooth += (target - smooth) * 0.07;
+    smooth += (target - smooth) * 0.045;
+    mouseS.x += (mouse.x - mouseS.x) * 0.03;
+    mouseS.y += (mouse.y - mouseS.y) * 0.03;
+
     const i = Math.min(STATES.length - 2, Math.floor(smooth)), f = smooth - i;
     const A = STATES[i], B = STATES[Math.min(i + 1, STATES.length - 1)];
     const L = (a, b) => a + (b - a) * f;
@@ -271,24 +313,23 @@ async function initGL() {
     const sMul = narrow ? 0.65 : 1;
     const xScale = narrow ? 0 : Math.min(camera.aspect / 1.78, 1.2);
 
-    blob.position.set(L(A.x, B.x) * xScale + mouse.x * 0.5, L(A.y, B.y) - mouse.y * 0.4, 0);
+    blob.position.set(L(A.x, B.x) * xScale + mouseS.x * 0.4, L(A.y, B.y) - mouseS.y * 0.3, 0);
     blob.scale.setScalar(L(A.s, B.s) * sMul);
-    blob.rotation.y = t * 0.12 + smooth * 1.4;
-    blob.rotation.x = smooth * 0.5 + mouse.y * 0.3;
+    blob.rotation.y = t * 0.12 + smooth * 1.2;
+    blob.rotation.x = smooth * 0.4 + mouseS.y * 0.2;
     uniforms.uTime.value = t;
     uniforms.uAmp.value = L(A.amp, B.amp);
     uniforms.uAlpha.value = L(A.a, B.a) * (narrow ? 0.6 : 1);
     ["uC1", "uC2", "uC3"].forEach((k, n) => uniforms[k].value.copy(A.pal[n]).lerp(tmp.copy(B.pal[n]), f));
 
     shapes.forEach((s, n) => {
-      const ang = t * (0.25 + n * 0.1) + n * 2.1 + smooth * 0.8;
-      s.position.set(Math.cos(ang) * (2.6 + n * 0.5) + blob.position.x * 0.5, Math.sin(ang * 1.3) * 1.6, Math.sin(ang) * 1.5);
-      s.rotation.x += 0.01; s.rotation.y += 0.014;
+      const ang = t * (0.14 + n * 0.05) + n * 2.1 + smooth * 0.5;
+      s.position.set(Math.cos(ang) * (2.6 + n * 0.5) + blob.position.x * 0.5, Math.sin(ang * 1.3) * 1.5, Math.sin(ang) * 1.5);
+      s.rotation.x = t * 0.18 + n; s.rotation.y = t * 0.24 + n * 2;
     });
-    points.rotation.y = t * 0.02 + smooth * 0.2;
-    points.position.y = smooth * 0.35;
+    points.rotation.y = t * 0.03 + smooth * 0.15;
+    points.position.y = smooth * 0.3;
 
-    // el escenario CSS se atenúa fuera del inicio
     document.documentElement.style.setProperty("--hero", Math.max(0, 1 - smooth).toFixed(3));
 
     renderer.render(scene, camera);

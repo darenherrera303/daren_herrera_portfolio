@@ -1,19 +1,23 @@
 // ============================================================
 //  EDITA AQUÍ: tus proyectos y skills.
-//  Para añadir un proyecto nuevo, copia un bloque y cámbialo.
-//  categoria: "UX" | "Diseño" | "3D" | "Código" | "Apps"
-//  (puedes inventar categorías nuevas; los filtros se crean solos)
-//  imagen: ruta a tu imagen, ej. "assets/proyecto1.jpg" (opcional)
-//  enlace: link al caso de estudio, repo o demo (opcional)
+//
+//  PROYECTOS (cada uno es un "archivo" dentro de una carpeta):
+//   categoria: define la carpeta ("UX", "Diseño", "3D", "Código", "Apps"...).
+//              Si inventas una categoría nueva, la carpeta aparece sola.
+//   herramientas: lo que usaste (se muestra en la ficha)
+//   imagen: ruta a tu imagen, ej. "assets/proyecto1.jpg" (opcional)
+//   enlace: link al caso de estudio, repo o demo (opcional)
+//
+//  SKILLS: lv va de 1 a 10 (se dibuja como barra de combo y rango D–S).
 // ============================================================
 
 window.PROJECTS = [
   {
-    titulo: "Rediseño App Móvil",
+    titulo: "Rediseño de App Móvil",
     categoria: "UX",
     anio: 2026,
     descripcion: "Investigación, flujos y prototipo de alta fidelidad para una app de movilidad urbana.",
-    tags: ["Figma", "Research", "Prototipado"],
+    herramientas: ["Adobe XD", "Photoshop", "Illustrator"],
     imagen: "",
     enlace: "#"
   },
@@ -21,53 +25,73 @@ window.PROJECTS = [
     titulo: "Identidad Visual Street",
     categoria: "Diseño",
     anio: 2026,
-    descripcion: "Sistema de marca con paleta de atardecer, tipografía condensada y piezas para redes.",
-    tags: ["Branding", "Illustrator", "Tipografía"],
+    descripcion: "Sistema de marca con paleta de atardecer, tipografía y piezas para redes.",
+    herramientas: ["Illustrator", "Photoshop"],
     imagen: "",
     enlace: "#"
   },
   {
-    titulo: "Escena 3D Neón",
+    titulo: "Personaje 3D Estilizado",
     categoria: "3D",
     anio: 2025,
-    descripcion: "Ambientación urbana nocturna con iluminación volumétrica y materiales emisivos.",
-    tags: ["Blender", "Cycles", "Texturizado"],
+    descripcion: "Escultura en alta resolución, retopología y texturizado de un personaje listo para animar.",
+    herramientas: ["ZBrush", "Blender"],
     imagen: "",
     enlace: "#"
   },
   {
-    titulo: "Visualizador Binario",
+    titulo: "Experiencia Interactiva en Unity",
     categoria: "Código",
     anio: 2025,
-    descripcion: "Experimento interactivo que convierte texto y audio en patrones binarios en tiempo real.",
-    tags: ["JavaScript", "Canvas", "WebAudio"],
+    descripcion: "Prototipo interactivo con mecánicas propias, UI y activos 3D integrados.",
+    herramientas: ["Unity", "C#", "Blender"],
     imagen: "",
     enlace: "#"
   },
   {
-    titulo: "App Multiplataforma",
-    categoria: "Apps",
+    titulo: "Sitio Web Interactivo",
+    categoria: "Código",
     anio: 2025,
-    descripcion: "Aplicación móvil con interfaz minimalista, autenticación y sincronización en la nube.",
-    tags: ["Flutter", "Firebase", "UI"],
+    descripcion: "Sitio responsive con animaciones y componentes interactivos hechos a mano.",
+    herramientas: ["HTML5", "CSS3", "JavaScript"],
     imagen: "",
     enlace: "#"
   },
   {
-    titulo: "Motion Reel",
-    categoria: "Diseño",
+    titulo: "Animación 3D Corta",
+    categoria: "3D",
     anio: 2024,
-    descripcion: "Colección de animaciones y gráficos en movimiento con ritmo y estética retro.",
-    tags: ["After Effects", "Motion"],
+    descripcion: "Pieza animada con ambientación, iluminación y render final.",
+    herramientas: ["Blender", "After Effects"],
     imagen: "",
     enlace: "#"
   }
 ];
 
+// Niveles de ejemplo: ajústalos con tu nivel real (1–10).
 window.SKILLS = {
-  "UX / UI": ["Investigación", "Wireframes", "Prototipado", "Design Systems", "Figma"],
-  "Diseño": ["Branding", "Tipografía", "Illustrator", "Photoshop", "Motion"],
-  "3D": ["Blender", "Modelado", "Texturizado", "Render", "Unity"],
-  "Programación": ["JavaScript", "HTML / CSS", "Python", "Git", "Canvas / WebGL"],
-  "Apps": ["Flutter", "React Native", "Firebase", "APIs REST"]
+  "3D & ANIMACIÓN": [
+    { n: "Blender", lv: 8 },
+    { n: "ZBrush", lv: 7 },
+    { n: "Unity", lv: 8 },
+    { n: "Activos 3D", lv: 8 },
+    { n: "Animación 3D", lv: 7 }
+  ],
+  "UI / UX": [
+    { n: "Diseño de interfaces", lv: 9 },
+    { n: "Experiencia de usuario", lv: 8 },
+    { n: "Adobe Creative Suite", lv: 8 },
+    { n: "Contenido visual interactivo", lv: 8 }
+  ],
+  "CÓDIGO": [
+    { n: "C#", lv: 7 },
+    { n: "JavaScript", lv: 7 },
+    { n: "HTML5", lv: 9 },
+    { n: "CSS3", lv: 9 }
+  ],
+  "PRODUCCIÓN": [
+    { n: "Producción multimedia", lv: 8 },
+    { n: "Trabajo en equipo", lv: 9 },
+    { n: "Adaptación tecnológica", lv: 9 }
+  ]
 };
