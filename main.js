@@ -5,12 +5,12 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ================= SONIDO (opcional) ================= */
 let audio = null, soundOn = false;
-function blip(freq = 520, dur = 0.07) {
+function blip(freq = 520, dur = 0.07, type = "square") {
   if (!soundOn) return;
   try {
     audio ||= new (window.AudioContext || window.webkitAudioContext)();
     const o = audio.createOscillator(), g = audio.createGain();
-    o.type = "square"; o.frequency.value = freq;
+    o.type = type; o.frequency.value = freq;
     g.gain.setValueAtTime(0.03, audio.currentTime);
     g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
     o.connect(g).connect(audio.destination);
@@ -26,21 +26,37 @@ $("#snd").addEventListener("click", (e) => {
 
 /* ================= ARCHIVADOR DE PROYECTOS ================= */
 const PROJECTS = window.PROJECTS || [];
-const SKILLS = window.SKILLS || {};
-const tabs = $("#filters"), grid = $("#projects");
+const SKILLS = window.SKILLS || [];
+const tabsEl = $("#filters"), grid = $("#projects");
 const cats = ["Todos", ...new Set(PROJECTS.map((p) => p.categoria))];
 let activeCat = "Todos";
 
+const CAT_COLORS = { Todos: "var(--yellow)", Videojuegos: "var(--pink)", Web: "var(--cyan)", Software: "var(--mint)" };
+const colorOf = (c) => CAT_COLORS[c] || "var(--purple)";
 const countOf = (c) => PROJECTS.filter((p) => c === "Todos" || p.categoria === c).length;
 
+const FOLDER_ICO = `<svg viewBox="0 0 26 20" shape-rendering="crispEdges"><path fill="currentColor" d="M2 2h9l2 3h11v13H2z"/></svg>`;
+
+// Portadas pixel-art por categoría (se usan si el proyecto no tiene imagen)
+function artIcon(cat) {
+  const dark = "#140f26";
+  const icons = {
+    Videojuegos: `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><path fill="currentColor" d="M12 8h40v4h4v16h-4v4H12v-4H8V12h4z"/><rect x="15" y="17" width="12" height="4" fill="${dark}"/><rect x="19" y="13" width="4" height="12" fill="${dark}"/><rect x="40" y="14" width="4" height="4" fill="${dark}"/><rect x="46" y="20" width="4" height="4" fill="${dark}"/></svg>`,
+    Web: `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><rect x="4" y="3" width="56" height="34" fill="currentColor"/><rect x="4" y="3" width="56" height="7" fill="${dark}" opacity=".55"/><rect x="8" y="5" width="3" height="3" fill="currentColor"/><rect x="13" y="5" width="3" height="3" fill="currentColor"/><rect x="8" y="14" width="22" height="18" fill="${dark}" opacity=".5"/><rect x="34" y="14" width="22" height="5" fill="${dark}" opacity=".5"/><rect x="34" y="22" width="22" height="10" fill="${dark}" opacity=".5"/></svg>`,
+    Software: `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><path fill="currentColor" d="M4 4h38v20H20l-8 7v-7H4z"/><path fill="currentColor" opacity=".7" d="M26 18h34v16h-6v7l-8-7H26z"/><rect x="10" y="10" width="26" height="3" fill="${dark}"/><rect x="10" y="16" width="16" height="3" fill="${dark}"/></svg>`,
+  };
+  return icons[cat] || `<svg viewBox="0 0 64 40" shape-rendering="crispEdges"><path fill="currentColor" d="M6 6h20l4 6h28v24H6z"/></svg>`;
+}
+
 function renderTabs() {
-  tabs.innerHTML = "";
+  tabsEl.innerHTML = "";
   cats.forEach((c) => {
     const b = document.createElement("button");
     b.className = "tab" + (c === activeCat ? " active" : "");
-    b.innerHTML = `${esc(c.toUpperCase())}<small>${countOf(c)}</small>`;
+    b.style.setProperty("--c", colorOf(c));
+    b.innerHTML = `${FOLDER_ICO}<span>${esc(c.toUpperCase())}</span><small>${countOf(c)}</small>`;
     b.onclick = () => { if (c === activeCat) return; activeCat = c; blip(480, 0.09); renderTabs(); renderFiles(); };
-    tabs.appendChild(b);
+    tabsEl.appendChild(b);
   });
 }
 
@@ -52,71 +68,146 @@ function renderFiles() {
   if (!list.length) { grid.innerHTML = `<p class="empty">Carpeta vacía.</p>`; return; }
 
   list.forEach(({ p, idx }, i) => {
-    const a = document.createElement("a");
-    a.className = "file";
-    a.href = p.enlace || "#";
-    if (p.enlace && p.enlace !== "#") { a.target = "_blank"; a.rel = "noopener"; }
-    const thumb = p.imagen
-      ? `<img src="${esc(p.imagen)}" alt="${esc(p.titulo)}" loading="lazy" />`
-      : `<div class="ph">${esc(p.titulo)}</div>`;
-    const code = `DH-${p.anio}-${String(idx + 1).padStart(3, "0")}`;
-    a.innerHTML = `
-      <div class="file-top"><span>${code}</span><span>${esc(p.anio)}</span></div>
-      <div class="thumb">${thumb}<span class="stamp">${esc(p.categoria.toUpperCase())}</span></div>
-      <h3>${esc(p.titulo)}</h3>
-      <p>${esc(p.descripcion)}</p>
-      <dl class="specs">
-        <dt>TIPO</dt><dd>${esc(p.categoria)}</dd>
-        <dt>HERRAM.</dt><dd>${esc((p.herramientas || []).join(" · ") || "—")}</dd>
-      </dl>
-      <span class="open">ABRIR ARCHIVO →</span>`;
-    a.addEventListener("pointermove", (e) => {
-      const r = a.getBoundingClientRect();
+    const el = document.createElement(p.enlace ? "a" : "article");
+    el.className = "fcard";
+    el.style.setProperty("--c", colorOf(p.categoria));
+    if (p.enlace) { el.href = p.enlace; el.target = "_blank"; el.rel = "noopener"; }
+    const code = `DH-${p.anio || "XXXX"}-${String(idx + 1).padStart(3, "0")}`;
+    const art = p.imagen ? `<img src="${esc(p.imagen)}" alt="${esc(p.titulo)}" loading="lazy" />` : artIcon(p.categoria);
+    el.innerHTML = `
+      <span class="ftab">${code}</span>
+      <div class="fbody"><div class="sheet">
+        <div class="art">${art}<span class="stamp">${esc(p.categoria.toUpperCase())}</span></div>
+        <div class="sbody">
+          <div class="smeta"><span>${esc(p.anio || "—")}</span><span>${esc(p.categoria.toUpperCase())}</span></div>
+          <h3>${esc(p.titulo)}</h3>
+          ${p.subtitulo ? `<p class="sub">${esc(p.subtitulo)}</p>` : ""}
+          ${p.rol ? `<p class="rol"><b>ROL ▸</b> ${esc(p.rol)}</p>` : ""}
+          <ul class="pts">${(p.puntos || []).map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+          <div class="tags">${(p.herramientas || []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
+          <div class="sfoot">${p.enlace ? `<span class="open">VER PROYECTO →</span>` : `<span class="state">● ARCHIVADO</span>`}<span>${code}</span></div>
+        </div>
+      </div></div>`;
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      a.style.transform = `perspective(700px) rotateY(${x * 7}deg) rotateX(${-y * 7}deg) translateY(-3px)`;
+      el.style.transform = `perspective(800px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-6px)`;
     });
-    a.addEventListener("pointerleave", () => { a.style.transform = ""; });
-    grid.appendChild(a);
-    setTimeout(() => a.classList.add("in"), reduced ? 0 : 90 * i);
+    el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+    grid.appendChild(el);
+    setTimeout(() => el.classList.add("in"), reduced ? 0 : 110 * i);
   });
 }
 renderTabs(); renderFiles();
 
-/* ================= SKILLS: NIVELES TIPO COMBO ================= */
-const rankOf = (lv) => (lv >= 9 ? "S" : lv >= 7 ? "A" : lv >= 5 ? "B" : lv >= 3 ? "C" : "D");
-let comboTotal = 0, comboCount = 0;
+/* ================= SKILLS: CARGA CON FUEGO 8-BIT ================= */
+// Paleta de llama (intensidad 0..11)
+const PAL = [
+  [0, 0, 0, 0], [90, 29, 46, 120], [122, 42, 62, 200], [164, 63, 82, 230], [196, 88, 111, 255],
+  [214, 112, 79, 255], [224, 146, 90, 255], [232, 176, 106, 255], [236, 200, 132, 255],
+  [240, 220, 159, 255], [246, 236, 196, 255], [255, 251, 232, 255],
+];
+const SEGMENTS = 20;
+const levelName = (lv) => (lv >= 9 ? "MAX" : lv >= 4 ? "MID" : "LOW");
 
-$("#skills-list").innerHTML = Object.entries(SKILLS).map(([group, items], g) => `
-  <article class="win">
-    <div class="tb"><span>${esc(group.toLowerCase())}.dll</span><em>_ □ ✕</em></div>
-    <div class="wb">
-      <h4>${esc(group)}</h4>
-      <ul>${items.map((s) => {
-        comboTotal += s.lv; comboCount++;
-        const r = rankOf(s.lv);
-        const segs = Array.from({ length: 10 }, (_, d) => `<i class="seg${d < s.lv ? " on" : ""}" style="--d:${d};--g:${g}"></i>`).join("");
-        return `<li class="sk"><span class="nm">${esc(s.n)}</span><span class="meter" aria-label="Nivel ${s.lv} de 10">${segs}</span><span class="rank r-${r}">${r}</span></li>`;
-      }).join("")}</ul>
+$("#skills-list").innerHTML = SKILLS.map((s, n) => `
+  <article class="sk-card" tabindex="0" style="--c:${s.color || "var(--pink)"}" data-lv="${s.lv}">
+    <div class="sk-top"><span>PLAYER ${n + 1}</span><span>${levelName(s.lv)} · LV ${s.lv}/10</span></div>
+    <h3>${esc(s.nombre)}</h3>
+    <ul class="pts">${(s.puntos || []).map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="tags">${(s.herramientas || []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
+    <div class="charge">
+      <canvas class="fire" aria-hidden="true"></canvas>
+      <div class="cbar" role="img" aria-label="Nivel ${s.lv} de 10">${Array.from({ length: SEGMENTS }, () => `<i class="cs"></i>`).join("")}</div>
+      <div class="cinfo"><span class="status">▶ PASA EL MOUSE PARA CARGAR</span><span class="pct">000%</span></div>
     </div>
   </article>`).join("");
 
-const avg = comboCount ? comboTotal / comboCount : 0;
-$("#comboRank").textContent = avg >= 8.5 ? "S" : avg >= 7 ? "A" : avg >= 5 ? "B" : "C";
+function setupCharge(card) {
+  const lv = Number(card.dataset.lv) || 0;
+  const target = Math.min(1, lv / 10);
+  const canvas = card.querySelector(".fire");
+  const ctx = canvas.getContext("2d");
+  const W = 64, H = 16;
+  canvas.width = W; canvas.height = H;
+  const fire = new Uint8Array(W * H);
+  const img = ctx.createImageData(W, H);
+  const segs = [...card.querySelectorAll(".cs")];
+  const pct = card.querySelector(".pct");
+  const status = card.querySelector(".status");
+  const maxI = lv >= 9 ? 11 : lv >= 4 ? 8 : 5; // más nivel = llama más alta
+  let level = 0, goal = 0, raf = 0, last = 0, reachedBlip = false;
 
-let comboRAF = 0;
-function runCombo() {
-  const el = $("#comboN");
-  cancelAnimationFrame(comboRAF);
-  if (reduced) { el.textContent = comboTotal; return; }
-  const start = performance.now(), dur = 1800;
-  const step = (now) => {
-    const k = Math.min(1, (now - start - 350) / dur);
-    el.textContent = Math.round(comboTotal * Math.max(0, k));
-    if (k < 1) comboRAF = requestAnimationFrame(step);
-  };
-  el.textContent = 0;
-  comboRAF = requestAnimationFrame(step);
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
+    const speed = goal > level ? 0.85 : 2.4;
+    level = level < goal ? Math.min(goal, level + speed * dt) : Math.max(goal, level - speed * dt);
+
+    const on = Math.round(level * SEGMENTS);
+    segs.forEach((s, i) => s.classList.toggle("on", i < on));
+    pct.textContent = String(Math.round(level * 100)).padStart(3, "0") + "%";
+
+    const done = goal > 0 && level >= goal;
+    card.classList.toggle("maxed", done && lv >= 9);
+    status.textContent = goal === 0 ? (level > 0 ? "…ENFRIANDO" : "▶ PASA EL MOUSE PARA CARGAR")
+      : !done ? "⚡ CARGANDO…"
+      : lv >= 9 ? "★ MAX · ¡SUPER LISTO! ★" : `▲ MID · ${lv}/10`;
+    if (done && !reachedBlip) { reachedBlip = true; blip(lv >= 9 ? 1040 : 760, 0.16); }
+
+    // fuego (autómata tipo "Doom fire", 8-bit)
+    const cols = Math.floor(W * level);
+    for (let x = 0; x < W; x++) fire[(H - 1) * W + x] = x < cols ? maxI : 0;
+    let alive = 0;
+    for (let y = 0; y < H - 1; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = fire[(y + 1) * W + x];
+        const r = Math.floor(Math.random() * 3);
+        const nx = Math.min(W - 1, Math.max(0, x - r + 1));
+        fire[y * W + nx] = Math.max(0, p - (Math.random() < 0.8 ? 1 : 0));
+      }
+    }
+    for (let i = 0; i < W * H; i++) {
+      const c = PAL[fire[i]], o = i * 4;
+      img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2]; img.data[o + 3] = c[3];
+      if (fire[i]) alive++;
+    }
+    ctx.putImageData(img, 0, 0);
+
+    if (goal > 0 || level > 0 || alive > 0) raf = requestAnimationFrame(frame);
+    else { raf = 0; card.classList.remove("hot"); }
+  }
+
+  function start() {
+    goal = target; reachedBlip = false;
+    card.classList.add("hot");
+    blip(420, 0.08);
+    if (reduced) {
+      level = goal; segs.forEach((s, i) => s.classList.toggle("on", i < Math.round(level * SEGMENTS)));
+      pct.textContent = String(Math.round(level * 100)).padStart(3, "0") + "%";
+      status.textContent = lv >= 9 ? "★ MAX ★" : `▲ MID · ${lv}/10`;
+      return;
+    }
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+  }
+  function stop() {
+    goal = 0;
+    if (reduced) {
+      level = 0; segs.forEach((s) => s.classList.remove("on"));
+      pct.textContent = "000%"; status.textContent = "▶ PASA EL MOUSE PARA CARGAR";
+      card.classList.remove("hot", "maxed");
+      return;
+    }
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+  }
+
+  card.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") start(); });
+  card.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") stop(); });
+  card.addEventListener("focus", start);
+  card.addEventListener("blur", stop);
+  // táctil: un toque carga, otro toque descarga
+  card.addEventListener("click", () => { if (matchMedia("(hover: none)").matches) (goal > 0 ? stop : start)(); });
 }
+$$(".sk-card").forEach(setupCharge);
 
 $("#year").textContent = new Date().getFullYear();
 $("#date").textContent = new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
@@ -139,8 +230,7 @@ function setActive(i) {
   current = i;
   links.forEach((l, k) => l.classList.toggle("on", k === i));
   sections.forEach((s, k) => s.classList.toggle("show", k === i));
-  if (i === 3) runCombo();
-  blip(300 + i * 90, 0.08);
+  blip(300 + i * 80, 0.08);
 }
 
 const io = new IntersectionObserver((entries) => {
@@ -156,7 +246,8 @@ addEventListener("keydown", (e) => {
   const down = ["ArrowDown", "PageDown"].includes(e.key);
   const up = ["ArrowUp", "PageUp"].includes(e.key);
   if (!down && !up) return;
-  if (document.activeElement && document.activeElement.tagName === "BUTTON") return;
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === "BUTTON") return;
   e.preventDefault();
   const next = Math.max(0, Math.min(sections.length - 1, current + (down ? 1 : -1)));
   sections[next].scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
@@ -166,6 +257,7 @@ addEventListener("keydown", (e) => {
 let tops = [];
 const measure = () => { tops = sections.map((s) => s.offsetTop); };
 addEventListener("resize", measure); addEventListener("load", measure); measure();
+new ResizeObserver(measure).observe(document.body);
 
 function progress() {
   const y = scrollY;
@@ -277,11 +369,13 @@ async function initGL() {
   scene.add(points);
 
   const C = (a, b, c) => [new THREE.Color(a), new THREE.Color(b), new THREE.Color(c)];
+  // un estado por sección: inicio, trabajo, sobre mí, skills, formación, contacto
   const STATES = [
     { x: 2.3, y: 0.15, s: 1.15, amp: 0.5, a: 0.95, pal: C("#c4869f", "#7fb4c0", "#dccb9f") },
-    { x: 3.6, y: -0.2, s: 0.6, amp: 0.32, a: 0.5, pal: C("#8a7db0", "#8fb8a4", "#7fb4c0") },
-    { x: 3.0, y: 0.1, s: 0.95, amp: 0.6, a: 0.8, pal: C("#7fb4c0", "#c4869f", "#8fb8a4") },
-    { x: 3.5, y: 0.0, s: 0.7, amp: 0.4, a: 0.55, pal: C("#8fb8a4", "#8a7db0", "#c4869f") },
+    { x: 3.9, y: -0.2, s: 0.55, amp: 0.3, a: 0.4, pal: C("#8a7db0", "#8fb8a4", "#7fb4c0") },
+    { x: 3.2, y: 0.1, s: 0.8, amp: 0.55, a: 0.55, pal: C("#7fb4c0", "#c4869f", "#8fb8a4") },
+    { x: 3.8, y: 0.0, s: 0.6, amp: 0.4, a: 0.4, pal: C("#c4869f", "#dccb9f", "#8a7db0") },
+    { x: 3.5, y: -0.1, s: 0.7, amp: 0.45, a: 0.5, pal: C("#8fb8a4", "#8a7db0", "#c4869f") },
     { x: 0.0, y: -0.3, s: 1.5, amp: 0.7, a: 0.4, pal: C("#c4869f", "#dccb9f", "#8a7db0") },
   ];
   const tmp = new THREE.Color();
@@ -298,7 +392,6 @@ async function initGL() {
   let smooth = 0;
   const clock = new THREE.Clock();
   function frame() {
-    // todo el movimiento va a ritmo lento
     const t = clock.getElapsedTime() * (reduced ? 0.1 : 0.45);
     const target = progress();
     smooth += (target - smooth) * 0.045;
@@ -315,8 +408,8 @@ async function initGL() {
 
     blob.position.set(L(A.x, B.x) * xScale + mouseS.x * 0.4, L(A.y, B.y) - mouseS.y * 0.3, 0);
     blob.scale.setScalar(L(A.s, B.s) * sMul);
-    blob.rotation.y = t * 0.12 + smooth * 1.2;
-    blob.rotation.x = smooth * 0.4 + mouseS.y * 0.2;
+    blob.rotation.y = t * 0.12 + smooth * 1.0;
+    blob.rotation.x = smooth * 0.35 + mouseS.y * 0.2;
     uniforms.uTime.value = t;
     uniforms.uAmp.value = L(A.amp, B.amp);
     uniforms.uAlpha.value = L(A.a, B.a) * (narrow ? 0.6 : 1);

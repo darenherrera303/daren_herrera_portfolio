@@ -1,97 +1,89 @@
 // ============================================================
 //  EDITA AQUÍ: tus proyectos y skills.
 //
-//  PROYECTOS (cada uno es un "archivo" dentro de una carpeta):
-//   categoria: define la carpeta ("UX", "Diseño", "3D", "Código", "Apps"...).
+//  PROYECTOS (cada uno es una "carpeta" dentro del archivador):
+//   categoria: define la carpeta ("Videojuegos", "Web", "Software"...).
 //              Si inventas una categoría nueva, la carpeta aparece sola.
-//   herramientas: lo que usaste (se muestra en la ficha)
-//   imagen: ruta a tu imagen, ej. "assets/proyecto1.jpg" (opcional)
-//   enlace: link al caso de estudio, repo o demo (opcional)
+//   rol, puntos, herramientas: se muestran en la ficha (rol y anio son opcionales).
+//   imagen: ruta a una captura, ej. "assets/devil-blood.jpg" (opcional;
+//           si no hay, se dibuja una portada con ícono pixel-art).
+//   enlace: link al repo, demo o caso de estudio (opcional).
 //
-//  SKILLS: lv va de 1 a 10 (se dibuja como barra de combo y rango D–S).
+//  SKILLS: lv va de 1 a 10. lv 9–10 = MAX, 4–8 = MID, 1–3 = LOW.
+//          Define qué tan alto carga el medidor y qué tan grande es el fuego.
 // ============================================================
 
 window.PROJECTS = [
   {
-    titulo: "Rediseño de App Móvil",
-    categoria: "UX",
-    anio: 2026,
-    descripcion: "Investigación, flujos y prototipo de alta fidelidad para una app de movilidad urbana.",
-    herramientas: ["Adobe XD", "Photoshop", "Illustrator"],
-    imagen: "",
-    enlace: "#"
-  },
-  {
-    titulo: "Identidad Visual Street",
-    categoria: "Diseño",
-    anio: 2026,
-    descripcion: "Sistema de marca con paleta de atardecer, tipografía y piezas para redes.",
-    herramientas: ["Illustrator", "Photoshop"],
-    imagen: "",
-    enlace: "#"
-  },
-  {
-    titulo: "Personaje 3D Estilizado",
-    categoria: "3D",
-    anio: 2025,
-    descripcion: "Escultura en alta resolución, retopología y texturizado de un personaje listo para animar.",
-    herramientas: ["ZBrush", "Blender"],
-    imagen: "",
-    enlace: "#"
-  },
-  {
-    titulo: "Experiencia Interactiva en Unity",
-    categoria: "Código",
-    anio: 2025,
-    descripcion: "Prototipo interactivo con mecánicas propias, UI y activos 3D integrados.",
+    titulo: "Devil Blood",
+    subtitulo: "Videojuego de acción 2.5D",
+    categoria: "Videojuegos",
+    anio: 2024,
+    rol: "Diseñador de mecánicas, UI y animaciones",
+    puntos: ["Implementación de IA básica", "Sistema de combate"],
     herramientas: ["Unity", "C#", "Blender"],
     imagen: "",
-    enlace: "#"
+    enlace: ""
   },
   {
-    titulo: "Sitio Web Interactivo",
-    categoria: "Código",
+    titulo: "Interfaz de DJ interactiva",
+    subtitulo: "Experiencia 3D en WebGL",
+    categoria: "Web",
     anio: 2025,
-    descripcion: "Sitio responsive con animaciones y componentes interactivos hechos a mano.",
-    herramientas: ["HTML5", "CSS3", "JavaScript"],
+    puntos: [
+      "Experiencia 3D con paneles dinámicos y animaciones",
+      "Integración de audio, volumen y video de fondo"
+    ],
+    herramientas: ["Three.js", "HTML/CSS", "Spline"],
     imagen: "",
-    enlace: "#"
+    enlace: ""
   },
   {
-    titulo: "Animación 3D Corta",
-    categoria: "3D",
-    anio: 2024,
-    descripcion: "Pieza animada con ambientación, iluminación y render final.",
-    herramientas: ["Blender", "After Effects"],
+    titulo: "Chatbot asesor legal PRIM",
+    subtitulo: "Asistente conversacional",
+    categoria: "Software",
+    anio: 2025,
+    puntos: ["Aplicativo en Java", "Programación de base de datos en Rasa", "Gestión del proyecto"],
+    herramientas: ["Java", "Rasa"],
     imagen: "",
-    enlace: "#"
+    enlace: ""
+  },
+  {
+    titulo: "Rediseño de página web empresarial",
+    subtitulo: "Sitio corporativo en Wix",
+    categoria: "Web",
+    anio: "",
+    puntos: [
+      "Uso de CSS/HTML",
+      "Consolidación con directivos y requerimientos",
+      "Creación de recursos y alternativas de navegación"
+    ],
+    herramientas: ["Wix", "HTML", "CSS"],
+    imagen: "",
+    enlace: ""
   }
 ];
 
-// Niveles de ejemplo: ajústalos con tu nivel real (1–10).
-window.SKILLS = {
-  "3D & ANIMACIÓN": [
-    { n: "Blender", lv: 8 },
-    { n: "ZBrush", lv: 7 },
-    { n: "Unity", lv: 8 },
-    { n: "Activos 3D", lv: 8 },
-    { n: "Animación 3D", lv: 7 }
-  ],
-  "UI / UX": [
-    { n: "Diseño de interfaces", lv: 9 },
-    { n: "Experiencia de usuario", lv: 8 },
-    { n: "Adobe Creative Suite", lv: 8 },
-    { n: "Contenido visual interactivo", lv: 8 }
-  ],
-  "CÓDIGO": [
-    { n: "C#", lv: 7 },
-    { n: "JavaScript", lv: 7 },
-    { n: "HTML5", lv: 9 },
-    { n: "CSS3", lv: 9 }
-  ],
-  "PRODUCCIÓN": [
-    { n: "Producción multimedia", lv: 8 },
-    { n: "Trabajo en equipo", lv: 9 },
-    { n: "Adaptación tecnológica", lv: 9 }
-  ]
-};
+window.SKILLS = [
+  {
+    nombre: "MODELADO 3D",
+    lv: 10,
+    color: "var(--pink)",
+    puntos: ["Modelado y animación 3D", "Optimización de assets para videojuegos"],
+    herramientas: ["Blender", "ZBrush", "Unity", "Cinema"]
+  },
+  {
+    nombre: "PROGRAMACIÓN",
+    lv: 5,
+    color: "var(--cyan)",
+    puntos: ["Desarrollo interactivo y web", "Lógica de juego e interfaces"],
+    herramientas: ["C#", "JavaScript", "HTML5", "CSS3", "Java", "Three.js", "Git"]
+  },
+  {
+    nombre: "DISEÑO",
+    lv: 10,
+    color: "var(--yellow)",
+    puntos: ["Diseño UX/UI y diseño web", "Branding y producción audiovisual"],
+    herramientas: ["Figma", "Photoshop", "Illustrator", "Premiere Pro", "After Effects", "Canva", "CapCut"]
+  }
+];

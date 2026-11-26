@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Daren Herrera — Ingeniero Multimedia</title>
-  <meta name="description" content="Portafolio de Daren Herrera, ingeniero multimedia: UI/UX, 3D, desarrollo web y experiencias interactivas." />
+  <meta name="description" content="Daren Herrera, ingeniero multimedia: diseño UX/UI, comunicación visual y productos digitales." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=VT323&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet" />
@@ -60,7 +60,8 @@
       <li><a href="#s1" data-i="1"><i>02</i><b>TRABAJO</b><small>作品</small></a></li>
       <li><a href="#s2" data-i="2"><i>03</i><b>SOBRE MÍ</b><small>私について</small></a></li>
       <li><a href="#s3" data-i="3"><i>04</i><b>SKILLS</b><small>スキル</small></a></li>
-      <li><a href="#s4" data-i="4"><i>05</i><b>CONTACTO</b><small>連絡</small></a></li>
+      <li><a href="#s4" data-i="4"><i>05</i><b>FORMACIÓN</b><small>学歴</small></a></li>
+      <li><a href="#s5" data-i="5"><i>06</i><b>CONTACTO</b><small>連絡</small></a></li>
     </ul>
     <button id="snd" class="snd" aria-pressed="false">♪ SONIDO: OFF</button>
     <p class="keys">↑ ↓ para navegar</p>
@@ -70,22 +71,22 @@
     <!-- INICIO -->
     <section id="s0" class="panel hero">
       <div class="corner tl"></div><div class="corner br"></div>
-      <p class="eyebrow">▶ INGENIERO MULTIMEDIA ・ UI/UX ・ 3D ・ WEB</p>
+      <p class="eyebrow">▶ INGENIERO MULTIMEDIA ・ DISEÑO UX/UI ・ COMUNICACIÓN VISUAL</p>
       <h1>
         <span class="glitch" data-text="DAREN">DAREN</span>
         <span class="glitch" data-text="HERRERA">HERRERA</span>
       </h1>
       <p class="lead">
-        Experiencias digitales, diseño de interfaces, modelado y animación 3D, y desarrollo web.
-        Ideas convertidas en proyectos funcionales y atractivos.
+        Diseño, desarrollo e implementación de productos digitales y audiovisuales,
+        con una visión integral centrada en el usuario.
       </p>
       <div class="cta">
         <a class="btn pink" href="#s1">VER PROYECTOS</a>
-        <a class="btn" href="#s4">HABLEMOS</a>
+        <a class="btn" href="#s5">HABLEMOS</a>
       </div>
       <div class="jp-vert" aria-hidden="true">ダレン・エレラ</div>
       <div class="ticker" aria-hidden="true">
-        <div><span>ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＩ／ＵＸ ・ ３Ｄ ・ ＵＮＩＴＹ ・ ＢＬＥＮＤＥＲ ・ ＷＥＢ ・ </span><span>ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＩ／ＵＸ ・ ３Ｄ ・ ＵＮＩＴＹ ・ ＢＬＥＮＤＥＲ ・ ＷＥＢ ・ </span></div>
+        <div><span>ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＩＮＧＥＮＩＥＲＯ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＸ／ＵＩ ・ ３Ｄ ・ ＵＮＩＴＹ ・ ＢＬＥＮＤＥＲ ・ ＷＥＢ ・ </span><span>ＤＡＲＥＮ ＨＥＲＲＥＲＡ ・ ＩＮＧＥＮＩＥＲＯ ＭＵＬＴＩＭＥＤＩＡ ・ ＵＸ／ＵＩ ・ ３Ｄ ・ ＵＮＩＴＹ ・ ＢＬＥＮＤＥＲ ・ ＷＥＢ ・ </span></div>
       </div>
     </section>
 
@@ -93,8 +94,11 @@
     <section id="s1" class="panel">
       <header class="ptitle"><span class="jp">作品</span><h2>TRABAJO</h2><i class="bar"></i></header>
       <div class="archive">
-        <div class="folder-tabs" id="filters"></div>
-        <div class="folder-body">
+        <nav class="index" aria-label="Carpetas">
+          <span class="index-label">▼ ÍNDICE</span>
+          <div id="filters" class="index-list"></div>
+        </nav>
+        <div class="drawer">
           <div class="folder-head"><span id="folderName"></span><span id="folderCount"></span></div>
           <div class="files" id="projects"></div>
         </div>
@@ -108,60 +112,108 @@
         <article class="win">
           <div class="tb"><span>perfil_profesional.txt</span><em>_ □ ✕</em></div>
           <div class="wb">
+            <p class="role">INGENIERO MULTIMEDIA | DISEÑO UX/UI | COMUNICACIÓN VISUAL Y PRODUCTOS DIGITALES</p>
             <p>
-              Ingeniero Multimedia con enfoque en el desarrollo de experiencias digitales, diseño UI/UX,
-              modelado y animación 3D, desarrollo web y creación de contenido visual interactivo.
+              Ingeniero Multimedia con énfasis en UX/UI y experiencia en diseño, desarrollo e
+              implementación de productos digitales y audiovisuales. Mi formación multidisciplinaria
+              me permite analizar necesidades de comunicación, identificar oportunidades de mejora y
+              desarrollar soluciones que integran diseño visual, experiencia de usuario, tecnología
+              interactiva y contenidos multimedia. Cuento con conocimientos en diseño web, modelado 3D,
+              desarrollo interactivo, branding y producción audiovisual, aportando una visión integral
+              para la creación de experiencias digitales centradas en el usuario.
             </p>
-            <p>
-              Cuento con conocimientos en Unity, Blender, ZBrush y herramientas de Adobe Creative Suite,
-              así como en programación con C#, JavaScript, HTML5 y CSS3. Me destaco por combinar creatividad,
-              pensamiento técnico e innovación para desarrollar soluciones digitales funcionales, atractivas y eficientes.
-            </p>
-            <p>
-              Tengo experiencia en diseño de interfaces, creación de activos 3D, desarrollo de experiencias
-              interactivas y producción multimedia, con capacidad para trabajar en equipos multidisciplinarios,
-              adaptarme a nuevas tecnologías y transformar ideas en proyectos digitales.
-            </p>
-            <p class="cursor">&gt; transformando ideas en proyectos digitales_</p>
+            <p class="cursor">&gt; soluciones creativas para experiencias digitales_</p>
           </div>
         </article>
+
         <article class="win small">
           <div class="tb"><span>datos.sys</span><em>_ □ ✕</em></div>
           <div class="wb">
+            <img class="avatar" src="assets/foto.jpg" alt="Daren Herrera" onerror="this.remove()" />
             <ul class="facts">
-              <li><b>ENFOQUE</b> UI/UX · 3D · WEB</li>
-              <li><b>MOTORES</b> UNITY</li>
-              <li><b>3D</b> BLENDER · ZBRUSH</li>
-              <li><b>CÓDIGO</b> C# · JS · HTML · CSS</li>
-              <li><b>BASE</b> COLOMBIA</li>
-              <li><b>ESTADO</b> <span class="ok">● DISPONIBLE</span></li>
+              <li><b>CORREO</b><a href="mailto:darenherrera34@gmail.com">darenherrera34@gmail.com</a></li>
+              <li><b>TELÉFONO</b><a href="tel:+573226869229">+57 322 686 9229</a></li>
+              <li><b>LINKEDIN</b><a href="https://www.linkedin.com/in/daren-santiago-herrera-prada" target="_blank" rel="noopener">daren-santiago-herrera-prada</a></li>
+              <li><b>ESPAÑOL</b><span>Nativo</span></li>
+              <li><b>INGLÉS</b><span>Avanzado</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="win wide">
+          <div class="tb"><span>fortalezas.cfg</span><em>_ □ ✕</em></div>
+          <div class="wb two">
+            <div>
+              <h4>FORTALEZAS</h4>
+              <div class="tags dark">
+                <span>UI/UX</span><span>Soluciones creativas</span><span>Diseño web</span>
+                <span>Liderazgo de equipo</span><span>Modelado 3D</span>
+              </div>
+            </div>
+            <div>
+              <h4>HABILIDADES BLANDAS</h4>
+              <div class="tags dark">
+                <span>Creatividad e innovación visual</span><span>Trabajo en equipo multidisciplinario</span>
+                <span>Gestión de tiempo en entornos ágiles</span><span>Adaptabilidad al cambio tecnológico</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SKILLS: medidor de carga con fuego 8-bit -->
+    <section id="s3" class="panel">
+      <header class="ptitle"><span class="jp">スキル</span><h2>SKILLS</h2><i class="bar"></i></header>
+      <p class="hint">▶ Pasa el mouse sobre cada módulo para cargar el combo (en celular, toca la tarjeta).</p>
+      <div class="skillgrid" id="skills-list"></div>
+    </section>
+
+    <!-- FORMACIÓN -->
+    <section id="s4" class="panel">
+      <header class="ptitle"><span class="jp">学歴</span><h2>FORMACIÓN</h2><i class="bar"></i></header>
+      <div class="edu">
+        <article class="win">
+          <div class="tb"><span>educacion.log</span><em>_ □ ✕</em></div>
+          <div class="wb">
+            <ol class="timeline">
+              <li>
+                <em>2019 – cursando</em>
+                <b>Ingeniería en Multimedia</b>
+                <span>Universidad Militar Nueva Granada</span>
+              </li>
+              <li>
+                <em>Egresado · 2014 – 2017</em>
+                <b>Bachiller académico</b>
+                <span>Institución Educativa Pablo Herrera</span>
+              </li>
+            </ol>
+          </div>
+        </article>
+        <article class="win">
+          <div class="tb"><span>certificados_sena.zip</span><em>_ □ ✕</em></div>
+          <div class="wb">
+            <ul class="certs">
+              <li><em>28 FEB 2025</em><b>Comunicación gráfica utilizando herramientas de Adobe Illustrator</b><span>★ Certificado · SENA</span></li>
+              <li><em>24 ABR 2025</em><b>Marketing digital</b><span>★ Certificado · SENA</span></li>
+              <li><em>02 OCT 2018</em><b>Esculpido y texturizado digital en Pixologic ZBrush</b><span>★ Certificado · SENA</span></li>
+              <li><em>31 JUL 2018</em><b>Diseño de videojuegos en tercera persona con Unity</b><span>★ Certificado · SENA</span></li>
             </ul>
           </div>
         </article>
       </div>
     </section>
 
-    <!-- SKILLS: niveles tipo juego de pelea -->
-    <section id="s3" class="panel">
-      <header class="ptitle"><span class="jp">スキル</span><h2>SKILLS</h2><i class="bar"></i></header>
-      <div class="fight">
-        <div class="fight-hud">
-          <span class="round">ROUND 1 — FIGHT!</span>
-          <span class="combo">COMBO <b id="comboN">0</b> HITS <em id="comboRank">S</em></span>
-        </div>
-        <div class="skills" id="skills-list"></div>
-      </div>
-    </section>
-
     <!-- CONTACTO -->
-    <section id="s4" class="panel contact">
+    <section id="s5" class="panel contact">
       <header class="ptitle"><span class="jp">連絡</span><h2>CONTACTO</h2><i class="bar"></i></header>
-      <a class="mail" href="mailto:tucorreo@ejemplo.com">tucorreo@ejemplo.com</a>
+      <a class="mail" href="mailto:darenherrera34@gmail.com">darenherrera34@gmail.com</a>
+      <a class="phone" href="tel:+573226869229">+57 322 686 9229</a>
       <div class="links">
+        <a class="btn pink" href="mailto:darenherrera34@gmail.com">ESCRIBIR</a>
+        <a class="btn" href="https://wa.me/573226869229" target="_blank" rel="noopener">WHATSAPP</a>
+        <a class="btn" href="https://www.linkedin.com/in/daren-santiago-herrera-prada" target="_blank" rel="noopener">LINKEDIN</a>
         <a class="btn" href="https://github.com/tu-usuario" target="_blank" rel="noopener">GITHUB</a>
-        <a class="btn" href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener">LINKEDIN</a>
-        <a class="btn" href="https://behance.net/tu-usuario" target="_blank" rel="noopener">BEHANCE</a>
-        <a class="btn" href="https://instagram.com/tu-usuario" target="_blank" rel="noopener">INSTAGRAM</a>
       </div>
       <footer class="footer">
         <span>© <span id="year"></span> DAREN HERRERA</span>

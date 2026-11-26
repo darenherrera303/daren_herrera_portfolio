@@ -2,7 +2,7 @@
 
 Portafolio de ingeniería multimedia en estilo **vaporwave 80s** (paleta sobria): fondo 3D (Three.js) con una "materia"
 que se transforma al hacer scroll, menú lateral tipo dashboard de consola, trabajos en formato de archivador
-(carpetas y fichas) y skills con barras de combo estilo juego de pelea.
+(carpetas con fichas) y skills con medidor de carga con fuego 8-bit al pasar el mouse.
 
 ## Publicar en GitHub Pages
 
@@ -16,16 +16,18 @@ que se transforma al hacer scroll, menú lateral tipo dashboard de consola, trab
 
 ## Personalizar
 
-- **Correo y redes:** `index.html`, sección CONTACTO (busca `tucorreo@ejemplo.com` y `tu-usuario`).
-- **Proyectos (archivador):** `projects.js`. Cada proyecto es un "archivo"; su `categoria` define la carpeta.
-  Si usas una categoría nueva, la carpeta aparece sola.
-- **Skills:** `projects.js` → `SKILLS`. `lv` de 1 a 10 define la barra y el rango (S ≥ 9, A ≥ 7, B ≥ 5, C ≥ 3).
-  Los niveles actuales son de ejemplo: ajústalos a tu nivel real.
-- **Imágenes:** carpeta `assets/` y `imagen: "assets/mi-proyecto.jpg"` en cada proyecto.
+- **Datos de contacto, perfil, formación y certificados:** `index.html` (secciones SOBRE MÍ, FORMACIÓN y CONTACTO).
+- **GitHub:** en `index.html`, sección CONTACTO, cambia `https://github.com/tu-usuario` por tu usuario real.
+- **Foto (opcional):** guarda una imagen como `assets/foto.jpg` y aparece sola en "Sobre mí".
+- **Proyectos (archivador):** `projects.js`. Cada proyecto es una carpeta; su `categoria` define el índice lateral.
+  Para agregar capturas: `imagen: "assets/devil-blood.jpg"`. Si no hay imagen, se dibuja una portada pixel-art.
+- **Skills:** `projects.js` → `SKILLS`. `lv` de 1 a 10: 9–10 = MAX (carga completa, fuego grande),
+  4–8 = MID (carga parcial, fuego mediano).
 - **Colores:** variables al inicio de `styles.css` (`--pink`, `--cyan`, `--mint`...) y paletas en `STATES` de `main.js`.
 - **Velocidad del movimiento 3D:** en `main.js`, el multiplicador `0.45` de `clock.getElapsedTime()`.
 
 ## Controles
 
 - Scroll, menú lateral, o teclas ↑ ↓ / PageUp / PageDown para saltar entre secciones.
+- Skills: pasa el mouse (o enfoca con Tab / toca en celular) para cargar el medidor.
 - Botón "SONIDO" activa los bips de navegación (apagado por defecto).
